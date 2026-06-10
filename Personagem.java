@@ -10,6 +10,14 @@ public class Personagem {
         this.ataque = ataque;
     }
 
+    public void receberDano(int dano) {
+        vida = vida - dano;
+
+        if(vida < 0) {
+            vida = 0;
+        }
+    }
+
     public String getNome() {
         return nome;
     }

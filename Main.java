@@ -8,5 +8,9 @@ public class Main {
         System.out.println(guerreiro.getVida());
         System.out.println(guerreiro.getAtaque());
 
+        guerreiro.receberDano(15);
+
+        System.out.println(guerreiro.getVida());
+
     }
 }
