@@ -30,6 +30,12 @@ Por enquanto estou fazendo as coisas aos poucos para entender melhor a lógica d
 
 ---
 
+## 10/06/2026
+
+Continuei um pouco do projeto 
+
+Coloquei o sistema de dano nos personagens, para permitir que a vida seja reduzida durante a batalha, e testei se a vida estava sendo atualizada corretamente
+
 ## Próximos Passos
 
 * Implementar o sistema de dano.
