@@ -38,7 +38,6 @@ Coloquei o sistema de dano nos personagens, para permitir que a vida seja reduzi
 
 ## Próximos Passos
 
-* Implementar o sistema de dano.
 * Criar o sistema de ataque entre personagens.
 * Desenvolver a lógica das batalhas por turno.
 * Adicionar habilidades aos personagens.
