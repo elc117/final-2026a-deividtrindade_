@@ -40,7 +40,9 @@ Coloquei o sistema de dano nos personagens, para permitir que a vida seja reduzi
 
 Acabei mexendo no sistema de ataque entre personagens utilizando o sistema de dano que já havia criado anteriormente.
 
-Por fim, comecei a adicionar e configurar a LibGDX no projeto para estudar como será feita a parte gráfica do jogo e a publicação na web
+Por fim, comecei a adicionar e configurar a LibGDX no projeto para estudar como será feita a parte gráfica do jogo e a publicação na web.
+
+Também adicionei, a estrutura de pastas, criando os models e a pasta de entidade, e o script do inimigo.
 
 ## Próximos Passos
 

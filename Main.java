@@ -1,3 +1,6 @@
+import io.github.some_example_name.model.entidades.Personagem;
+
+
 public class Main {
 
     public static void main(String[] args) {
