@@ -3,14 +3,14 @@ public class Main {
     public static void main(String[] args) {
 
         Personagem guerreiro = new Personagem("Guerreiro", 100, 20);
+        Personagem orc = new Personagem("Orc", 80, 15);
 
-        System.out.println(guerreiro.getNome());
-        System.out.println(guerreiro.getVida());
-        System.out.println(guerreiro.getAtaque());
+        System.out.println("Vida do Orc antes do ataque: " + orc.getVida());
 
-        guerreiro.receberDano(15);
+        guerreiro.atacar(orc);
 
-        System.out.println(guerreiro.getVida());
+        System.out.println("Vida do Orc depois do ataque: " + orc.getVida());
+
 
     }
 }

@@ -17,6 +17,10 @@ public class Personagem {
             vida = 0;
         }
     }
+    
+    public void atacar(Personagem inimigo) {
+        inimigo.receberDano(ataque);
+    }
 
     public String getNome() {
         return nome;
