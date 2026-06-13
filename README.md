@@ -36,9 +36,14 @@ Continuei um pouco do projeto
 
 Coloquei o sistema de dano nos personagens, para permitir que a vida seja reduzida durante a batalha, e testei se a vida estava sendo atualizada corretamente
 
+## 13/06/2026
+
+Acabei mexendo no sistema de ataque entre personagens utilizando o sistema de dano que já havia criado anteriormente.
+
+Por fim, comecei a adicionar e configurar a LibGDX no projeto para estudar como será feita a parte gráfica do jogo e a publicação na web.
+
 ## Próximos Passos
 
-* Criar o sistema de ataque entre personagens.
 * Desenvolver a lógica das batalhas por turno.
 * Adicionar habilidades aos personagens.
 * Criar um sistema de pontuação.
