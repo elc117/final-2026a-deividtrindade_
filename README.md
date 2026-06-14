@@ -46,7 +46,7 @@ Também adicionei, a estrutura de pastas, criando os models e a pasta de entidad
 
 ## 14/06/2026
 
-Consegui criar a primeira tela do jogo utilizando a LibGDX.
+Consegui criar a primeira tela do jogo utilizando a `LibGDX`.
 
 Fiz tambem nessa primeira versão a tela que mostra o nome do jogo e informações básicas do Guerreiro e do Orc.
 
