@@ -1,32 +1,38 @@
 package io.github.some_example_name;
 
 import com.badlogic.gdx.ApplicationAdapter;
-import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.ScreenUtils;
 
-/** {@link com.badlogic.gdx.ApplicationListener} implementation shared by all platforms. */
 public class Main extends ApplicationAdapter {
+
     private SpriteBatch batch;
-    private Texture image;
+    private BitmapFont fonte;
 
     @Override
     public void create() {
         batch = new SpriteBatch();
-        image = new Texture("libgdx.png");
+        fonte = new BitmapFont();
     }
 
     @Override
     public void render() {
         ScreenUtils.clear(0.15f, 0.15f, 0.2f, 1f);
+
         batch.begin();
-        batch.draw(image, 140, 210);
+
+        fonte.draw(batch, "RPG por Turno", 100, 400);
+        fonte.draw(batch, "Guerreiro - Vida: 100 - Ataque: 20", 100, 350);
+        fonte.draw(batch, "Orc - Vida: 80 - Ataque: 15", 100, 320);
+        fonte.draw(batch, "Versao inicial do projeto", 100, 270);
+
         batch.end();
     }
 
     @Override
     public void dispose() {
         batch.dispose();
-        image.dispose();
+        fonte.dispose();
     }
 }
