@@ -52,6 +52,8 @@ Fiz tambem nessa primeira versão a tela que mostra o nome do jogo e informaçõ
 
 Também realizei testes para verificar se a aplicação estava executando corretamente.
 
+Gerei a versão web do projeto utilizando a LibGDX e realizei a publicação inicial no itch.io para a primeira entrega inicial do projeto.
+
 ## Próximos Passos
 
 * Desenvolver a lógica das batalhas por turno.
