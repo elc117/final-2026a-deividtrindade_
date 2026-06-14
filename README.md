@@ -44,6 +44,14 @@ Por fim, comecei a adicionar e configurar a LibGDX no projeto para estudar como 
 
 Também adicionei, a estrutura de pastas, criando os models e a pasta de entidade, e o script do inimigo.
 
+## 14/06/2026
+
+Consegui criar a primeira tela do jogo utilizando a LibGDX.
+
+Fiz tambem nessa primeira versão a tela que mostra o nome do jogo e informações básicas do Guerreiro e do Orc.
+
+Também realizei testes para verificar se a aplicação estava executando corretamente.
+
 ## Próximos Passos
 
 * Desenvolver a lógica das batalhas por turno.
