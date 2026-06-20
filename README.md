@@ -54,6 +54,16 @@ Também realizei testes para verificar se a aplicação estava executando corret
 
 Gerei a versão web do projeto utilizando a LibGDX e realizei a publicação inicial no itch.io para a primeira entrega inicial do projeto.
 
+## 20/06/2026
+
+Continuei o desenvolvimento da interface gráfica utilizando LibGDX.
+
+Adicionei um fundo ao cenário para melhorar a apresentação visual do jogo e implementei um sistema básico de interação por teclado, permitindo que o jogador realize ataques utilizando a tecla 1.
+
+Também foi criado um sistema de mensagens na tela para exibir o resultado das ações realizadas durante o combate, atualizando dinamicamente a vida do inimigo.
+
+Durante esta etapa utilizei ferramentas de IA como apoio para estudar recursos da LibGDX, testar alternativas de interface e acelerar a prototipação da tela inicial, mantendo a implementação e adaptação do código de acordo com a necessidade.
+
 ## Próximos Passos
 
 * Desenvolver a lógica das batalhas por turno.
