@@ -1,19 +1,34 @@
 package io.github.some_example_name;
 
 import com.badlogic.gdx.ApplicationAdapter;
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.ScreenUtils;
+
+import io.github.some_example_name.model.entidades.Personagem;
 
 public class Main extends ApplicationAdapter {
 
     private SpriteBatch batch;
     private BitmapFont fonte;
+    private Texture fundo;
+    private Personagem guerreiro;
+    private Personagem orc;
+    private String mensagem;
 
     @Override
     public void create() {
         batch = new SpriteBatch();
         fonte = new BitmapFont();
+        fundo = new Texture("floresta.png");
+
+        guerreiro = new Personagem("Guerreiro", 100, 20);
+        orc = new Personagem("Orc", 80, 15);
+
+        mensagem = "Aguardando comando...";
     }
 
     @Override
@@ -22,8 +37,16 @@ public class Main extends ApplicationAdapter {
 
         batch.begin();
 
+        if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_1)) {
+            guerreiro.atacar(orc);
+
+            mensagem = "Guerreiro atacou! VIda do Orc: " + orc.getVida();
+        }
+
+        batch.draw(fundo, 0, 0);
+
         fonte.getData().setScale(1.5f);
-        fonte.draw(batch, "RPG por Turno", 100, 620);
+        fonte.draw(batch, "Arena RPG", 100, 620);
 
         fonte.getData().setScale(1.1f);
         fonte.draw(batch, "Versao inicial publicada para teste web", 100, 560);
@@ -41,7 +64,12 @@ public class Main extends ApplicationAdapter {
         fonte.draw(batch, "- Inimigo inicial", 100, 210);
 
         fonte.draw(batch, "Proximos passos: batalha, habilidades e pontuacao", 100, 150);
+        
+        fonte.draw(batch, "ACOES:", 100, 180);
+        fonte.draw(batch, "[1] Atacar", 100, 150);
 
+        fonte.draw(batch, mensagem, 100, 100);
+        
         batch.end();
     }
 
@@ -49,5 +77,6 @@ public class Main extends ApplicationAdapter {
     public void dispose() {
         batch.dispose();
         fonte.dispose();
+        fundo.dispose();
     }
 }
