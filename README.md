@@ -1,6 +1,6 @@
 # Trabalho Final de Paradigmas
 
-## Jogo: RPG por Turno
+## Jogo: Arena RPG
 
 **Aluno:** Deivid Da Silva Trindade
 
@@ -64,8 +64,18 @@ Também foi criado um sistema de mensagens na tela para exibir o resultado das a
 
 Durante esta etapa utilizei ferramentas de IA como apoio para estudar recursos da LibGDX, testar alternativas de interface e acelerar a prototipação da tela inicial, mantendo a implementação e adaptação do código de acordo com a necessidade.
 
+## 22/06/2026
+
+Hoje consegui fechar a lógica principal do combate e dar uma ajeitada na tela.
+
+Como as letras estavam difíceis de ler por causa do fundo da floresta, coloquei umas caixas horizontais para ficar melhor de ver os textos e fiz umas barrinhas de vida de texto 'Provisório' pra ficar melhor de visualizar.
+
+Na parte do código, terminei o loop dos turnos: agora quando o guerreiro ataca ou usa a nova opção de curar, o Orc já ataca de volta automaticamente. Também adicionei a verificação de fim de jogo (mostrando vitória ou derrota) e a opção de apertar 'R' para reiniciar a partida sem precisar fechar a janela.
+
+Acabei tendo que aumentar o tamanho da janela padrão do LibGDX também, porque a tela original estava cortando as informações.
+
 ## Próximos Passos
 
-* Desenvolver a lógica das batalhas por turno.
+* Trocar essas caixas e textos por sprites e imagens de verdade (personagens e botões).
 * Adicionar habilidades aos personagens.
 * Criar um sistema de pontuação.
