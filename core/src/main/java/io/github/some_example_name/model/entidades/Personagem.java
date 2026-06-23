@@ -6,7 +6,6 @@ public class Personagem {
     private int vida;
     private int ataque;
 
-
     public Personagem(String nome, int vida, int ataque) {
         this.nome = nome;
         this.vida = vida;
@@ -14,10 +13,17 @@ public class Personagem {
 
     }
 
+    public void curar(int quantidade) {
+        this.vida += quantidade;
+        if (this.vida > 100) {
+            this.vida = 100;
+        }
+    }
+
     public int receberDano(int dano) {
         vida = vida - dano;
 
-        if(vida < 0) {
+        if (vida < 0) {
             vida = 0;
             return vida;
         }
@@ -27,7 +33,7 @@ public class Personagem {
     public boolean estaVivo() {
         return vida > 0;
     }
-    
+
     public void atacar(Personagem inimigo) {
         inimigo.receberDano(ataque);
     }
