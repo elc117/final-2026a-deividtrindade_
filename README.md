@@ -74,8 +74,16 @@ Na parte do código, terminei o loop dos turnos: agora quando o guerreiro ataca 
 
 Acabei tendo que aumentar o tamanho da janela padrão do LibGDX também, porque a tela original estava cortando as informações.
 
+## 23/06/2026
+
+Hoje foquei em melhorar o visual do jogo. Troquei o fundo por um cenário de floresta em camadas para dar profundidade e adicionei os sprites em pixel art. Tive que usar uma função da própria LibGDX para espelhar a textura do Orc e ele não ficar de costas.
+
+Como os painéis de texto estavam cobrindo o cenário, reduzi o tamanho deles: coloquei as informações de vida no topo e os botões de ação numa barra no rodapé.
+
+Na parte do código, implementei os cliques do mouse criando um método para calcular a área de contato na tela. Agora dá para jogar tanto pelo teclado quanto clicando. Por fim, criei uma animação de ataque simples manipulando o eixo X no loop de renderização, fazendo o personagem dar uma investida e voltar para a posição inicial.
+
 ## Próximos Passos
 
-* Trocar essas caixas e textos por sprites e imagens de verdade (personagens e botões).
-* Adicionar habilidades aos personagens.
-* Criar um sistema de pontuação.
+* Implementar o sistema de pontuação por dano e vitória.
+
+* Adicionar habilidades aos personagens (ataque especial).
