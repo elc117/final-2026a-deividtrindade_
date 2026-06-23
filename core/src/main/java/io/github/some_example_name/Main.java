@@ -3,7 +3,6 @@ package io.github.some_example_name;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
-import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -26,13 +25,19 @@ public class Main extends ApplicationAdapter {
     
     private Texture spriteGuerreiro;
     private Texture spriteOrc;
+    
+    private Texture painel;
+    private Texture bolaFogo;
 
     private Personagem guerreiro;
     private Personagem orc;
     private String mensagem;
     private int estadoTela;
-    
     private int posicaoXGuerreiro;
+    private int pontuacao;
+    
+    private boolean orcAtacando;
+    private int bolaFogoX;
 
     @Override
     public void create() {
@@ -48,24 +53,18 @@ public class Main extends ApplicationAdapter {
         
         spriteGuerreiro = new Texture("guerreiro.png");
         spriteOrc = new Texture("orc.png");
+        
+        painel = new Texture("painel.png");
+        bolaFogo = new Texture("fogo.png");
 
         guerreiro = new Personagem("Guerreiro", 100, 20);
         orc = new Personagem("Orc", 80, 15);
 
         mensagem = "Aguardando comando...";
         estadoTela = 0;
-        posicaoXGuerreiro = 200;
-    }
-
-    private String barraVida(int vidaAtual, int vidaMaxima) {
-        int blocos = (vidaAtual * 10) / vidaMaxima;
-        String barra = "[";
-        for (int i = 0; i < 10; i++) {
-            if (i < blocos) barra += "#";
-            else barra += "-";
-        }
-        barra += "]";
-        return barra;
+        posicaoXGuerreiro = 200; 
+        pontuacao = 0; 
+        orcAtacando = false;
     }
 
     private boolean isClicado(int x, int y, int largura, int altura) {
@@ -87,12 +86,26 @@ public class Main extends ApplicationAdapter {
             posicaoXGuerreiro -= 5; 
         }
 
+        if (orcAtacando) {
+            bolaFogoX -= 15; 
+            if (bolaFogoX <= 200) { 
+                orcAtacando = false;
+                orc.atacar(guerreiro);
+                mensagem = "O Orc te acertou com magia!";
+                if (guerreiro.getVida() <= 0) {
+                    mensagem = "DERROTA! Voce foi eliminado.";
+                }
+            }
+        }
+
         if (estadoTela == 0) {
-            if (Gdx.input.isKeyJustPressed(Input.Keys.ENTER) || isClicado(280, 260, 400, 60)) {
+            if (Gdx.input.isKeyJustPressed(Input.Keys.ENTER) || isClicado(260, 300, 400, 120)) {
                 guerreiro = new Personagem("Guerreiro", 100, 20);
                 orc = new Personagem("Orc", 80, 15);
                 mensagem = "Aguardando comando...";
                 estadoTela = 1;
+                pontuacao = 0;
+                orcAtacando = false;
             }
 
             batch.begin();
@@ -101,47 +114,42 @@ public class Main extends ApplicationAdapter {
             batch.draw(arvoresMeio, 0, 0, 960, 720);
             batch.draw(arvoresFrente, 0, 0, 960, 720);
             batch.draw(chao, 0, 0, 960, 200);
+            
+            batch.draw(painel, 180, 180, 600, 350); 
             batch.end();
-
-            Gdx.gl.glEnable(GL20.GL_BLEND);
-            Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
-            shape.begin(ShapeRenderer.ShapeType.Filled);
-            shape.setColor(0, 0, 0, 0.7f);
-            shape.rect(0, 0, 960, 720);
-            shape.end();
-            Gdx.gl.glDisable(GL20.GL_BLEND);
 
             batch.begin();
             fonte.getData().setScale(2.5f);
-            fonte.draw(batch, "ARENA RPG", 350, 450);
+            fonte.draw(batch, "ARENA RPG", 350, 400); 
             fonte.getData().setScale(1.2f);
-            fonte.draw(batch, "Pressione [ENTER] ou Clique aqui para iniciar", 280, 300);
+            fonte.draw(batch, "Pressione [ENTER] ou Clique aqui para iniciar", 260, 320); 
             batch.end();
 
         } else if (estadoTela == 1) {
-            if (guerreiro.getVida() > 0 && orc.getVida() > 0) {
-
-                if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_1) || isClicado(60, 50, 150, 40)) {
+            if (guerreiro.getVida() > 0 && orc.getVida() > 0 && !orcAtacando) {
+                if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_1) || isClicado(60, 80, 150, 40)) {
                     guerreiro.atacar(orc);
-                    posicaoXGuerreiro = 350;
-                    mensagem = "Voce atacou o Orc!";
+                    posicaoXGuerreiro = 350; 
+                    pontuacao += 10;
+                    mensagem = "Voce atacou o Orc! (+10 pts)";
 
                     if (orc.getVida() <= 0) {
-                        mensagem = "VITORIA! O Orc foi derrotado.";
+                        pontuacao += 50;
+                        mensagem = "VITORIA! O Orc foi derrotado. (+50 pts)";
                     } else {
-                        orc.atacar(guerreiro);
-                        mensagem += " O Orc contra-atacou!";
-                        if (guerreiro.getVida() <= 0) mensagem = "DERROTA! Voce foi eliminado.";
+                        orcAtacando = true;
+                        bolaFogoX = 600;
+                        mensagem += " Ele esta conjurando magia!";
                     }
-                } else if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_2) || isClicado(250, 50, 250, 40)) {
+                } else if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_2) || isClicado(250, 80, 250, 40)) {
                     guerreiro.curar(30);
                     mensagem = "Voce recuperou vida!";
-                    orc.atacar(guerreiro);
-                    mensagem += " O Orc atacou!";
-                    if (guerreiro.getVida() <= 0) mensagem = "DERROTA! Voce foi eliminado.";
+                    orcAtacando = true;
+                    bolaFogoX = 600;
+                    mensagem += " O Orc conjurou magia!";
                 }
-            } else {
-                if (Gdx.input.isKeyJustPressed(Input.Keys.R) || isClicado(60, 50, 300, 40)) {
+            } else if (guerreiro.getVida() <= 0 || orc.getVida() <= 0) {
+                if (Gdx.input.isKeyJustPressed(Input.Keys.R) || isClicado(60, 80, 300, 40)) {
                     estadoTela = 0;
                 }
             }
@@ -152,46 +160,62 @@ public class Main extends ApplicationAdapter {
             batch.draw(arvoresMeio, 0, 0, 960, 720);
             batch.draw(arvoresFrente, 0, 0, 960, 720);
             batch.draw(chao, 0, 0, 960, 200);
-            batch.end();
 
-            batch.begin();
             batch.draw(spriteGuerreiro, posicaoXGuerreiro, 150, 150, 150); 
             batch.draw(spriteOrc, 600, 150, 150, 150, 0, 0, spriteOrc.getWidth(), spriteOrc.getHeight(), true, false);
+
+            if (orcAtacando) {
+                batch.draw(bolaFogo, bolaFogoX, 180, 60, 60); 
+            }
+
+            batch.draw(painel, 10, 480, 280, 300); 
+            batch.draw(painel, 670, 480, 280, 300); 
+            
+            batch.draw(painel, 10, -80, 940, 320); 
             batch.end();
 
-            Gdx.gl.glEnable(GL20.GL_BLEND);
-            Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
             shape.begin(ShapeRenderer.ShapeType.Filled);
-            shape.setColor(0, 0, 0, 0.7f);
-
-            shape.rect(20, 580, 250, 120); // Jogador
-            shape.rect(690, 580, 250, 120); // Inimigo
             
-            shape.rect(20, 20, 920, 100);
+            shape.setColor(0.3f, 0.3f, 0.3f, 1f);
+            shape.rect(40, 580, 200, 18);
+            shape.setColor(0.2f, 0.8f, 0.2f, 1f);
+            float hpGuerreiro = Math.max(0, ((float) guerreiro.getVida() / 100) * 200);
+            shape.rect(40, 580, hpGuerreiro, 18);
 
+            shape.setColor(0.3f, 0.3f, 0.3f, 1f);
+            shape.rect(710, 580, 200, 18);
+            shape.setColor(0.8f, 0.2f, 0.2f, 1f);
+            float hpOrc = Math.max(0, ((float) orc.getVida() / 80) * 200);
+            shape.rect(710, 580, hpOrc, 18);
+            
             shape.end();
-            Gdx.gl.glDisable(GL20.GL_BLEND);
 
             batch.begin();
             fonte.getData().setScale(1.1f);
 
-            fonte.draw(batch, guerreiro.getNome(), 40, 680);
-            fonte.draw(batch, "Vida: " + guerreiro.getVida(), 40, 650);
-            fonte.draw(batch, barraVida(guerreiro.getVida(), 100), 40, 620);
+            fonte.draw(batch, guerreiro.getNome(), 40, 660);
+            fonte.draw(batch, "Vida: " + guerreiro.getVida(), 40, 625);
+            
+            fonte.getData().setScale(1.5f);
+            fonte.draw(batch, "PONTOS: " + pontuacao, 400, 700);
+            fonte.getData().setScale(1.1f);
             
             fonte.draw(batch, "VS", 465, 640);
 
-            fonte.draw(batch, orc.getNome(), 710, 680);
-            fonte.draw(batch, "Vida: " + orc.getVida(), 710, 650);
-            fonte.draw(batch, barraVida(orc.getVida(), 80), 710, 620);
+            fonte.draw(batch, orc.getNome(), 710, 660);
+            fonte.draw(batch, "Vida: " + orc.getVida(), 710, 625);
 
             if (guerreiro.getVida() > 0 && orc.getVida() > 0) {
-                fonte.draw(batch, "[1] Atacar", 60, 80);
-                fonte.draw(batch, "[2] Curar (+30 HP)", 250, 80);
+                if (!orcAtacando) {
+                    fonte.draw(batch, "[1] Atacar", 60, 110);
+                    fonte.draw(batch, "[2] Curar (+30 HP)", 250, 110);
+                } else {
+                    fonte.draw(batch, "Aguarde o turno do inimigo...", 60, 110);
+                }
             } else {
-                fonte.draw(batch, "[R] Voltar ao Menu (Clique aqui)", 60, 80);
+                fonte.draw(batch, "[R] Voltar ao Menu (Clique aqui)", 60, 110);
             }
-            fonte.draw(batch, "Log: " + mensagem, 60, 50);
+            fonte.draw(batch, "Log: " + mensagem, 60, 65);
 
             batch.end();
         }
@@ -209,5 +233,7 @@ public class Main extends ApplicationAdapter {
         chao.dispose();
         spriteGuerreiro.dispose();
         spriteOrc.dispose();
+        painel.dispose();
+        bolaFogo.dispose();
     }
 }
