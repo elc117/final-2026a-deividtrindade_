@@ -112,7 +112,8 @@ Feedback Visual: Implementei mudanças de cor (batch.setColor) para indicar cura
 ---
 
 ## Diagrama de Classes
-![Diagrama de Classes](assets/Diagrama%20-%20Arena%20RPG.png)
+<img src="assets/Diagrama%20-%20Arena%20RPG.png" alt="Diagrama de Classes" width="350">
+
 *(Diagrama gerado com Mermaid Live Editor)*
 
 ---
@@ -130,6 +131,9 @@ No terminal, dentro da pasta do projeto, execute o comando: ./gradlew desktop:ru
 
 Resultado Final
 ![Resultado Final](assets/arena_rpg_image.jpeg)
+
+Vídeo Do Resultado
+![Vídeo Do Resultado](assets/Arena_RPG_Vídeo.gif)
 
 ---
 
