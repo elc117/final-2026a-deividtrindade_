@@ -1,8 +1,11 @@
 package io.github.some_example_name;
 
+import java.util.Random;
+
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -24,26 +27,43 @@ public class Main extends ApplicationAdapter {
     private Texture chao;
     
     private Texture spriteGuerreiro;
-    private Texture spriteOrc;
-    
-    private Texture painel;
+    private Texture spriteMago;
+    private Texture spriteAssassino;
+    private Texture spriteDragao;
     private Texture bolaFogo;
 
-    private Personagem guerreiro;
-    private Personagem orc;
+    private Personagem grupoHerois;
+    private Personagem dragao;
     private String mensagem;
     private int estadoTela;
-    private int posicaoXGuerreiro;
-    private int pontuacao;
     
-    private boolean orcAtacando;
+    private int xGuerreiro;
+    private int xMago;
+    private int xAssassino;
+    
+    private int pontuacao;
+    private final int META_PONTUACAO = 300;
+    
+    private boolean dragaoAtacando;
     private int bolaFogoX;
+    
+    private boolean guerreiroAtacando;
+    private int bolaFogoGuerreiroX;
+    
+    private boolean buffAtivo;
+    private boolean aguardandoDragao;
+    private float timerDelay;
+    private int acaoAtual;
+    
+    private float rDragao, gDragao, bDragao;
+    private Random random;
 
     @Override
     public void create() {
         batch = new SpriteBatch();
-        fonte = new BitmapFont();
+        fonte = new BitmapFont(); 
         shape = new ShapeRenderer();
+        random = new Random();
 
         ceu = new Texture("1_ceu.png");
         arvoresFundo = new Texture("2_arvores_fundo.png");
@@ -52,19 +72,29 @@ public class Main extends ApplicationAdapter {
         chao = new Texture("5_chao.png");
         
         spriteGuerreiro = new Texture("guerreiro.png");
-        spriteOrc = new Texture("orc.png");
-        
-        painel = new Texture("painel.png");
+        spriteMago = new Texture("mago.png");
+        spriteAssassino = new Texture("assassino.png"); 
+        spriteDragao = new Texture("dragao.png");
         bolaFogo = new Texture("fogo.png");
 
-        guerreiro = new Personagem("Guerreiro", 100, 20);
-        orc = new Personagem("Orc", 80, 15);
+        grupoHerois = new Personagem("Grupo Heróis", 100, 20);
+        dragao = new Personagem("Dragão Ancião", 200, 18);
+        
+        rDragao = gDragao = bDragao = 1f;
 
         mensagem = "Aguardando comando...";
         estadoTela = 0;
-        posicaoXGuerreiro = 200; 
+        
+        xGuerreiro = 190;
+        xMago = 120;
+        xAssassino = 50;
+        
         pontuacao = 0; 
-        orcAtacando = false;
+        dragaoAtacando = false;
+        guerreiroAtacando = false;
+        buffAtivo = false;
+        aguardandoDragao = false;
+        acaoAtual = 0;
     }
 
     private boolean isClicado(int x, int y, int largura, int altura) {
@@ -82,30 +112,83 @@ public class Main extends ApplicationAdapter {
     public void render() {
         ScreenUtils.clear(0.15f, 0.15f, 0.2f, 1f);
 
-        if (posicaoXGuerreiro > 200) {
-            posicaoXGuerreiro -= 5; 
+        if (xGuerreiro > 190) xGuerreiro -= 5;
+
+        if (aguardandoDragao) {
+            timerDelay -= Gdx.graphics.getDeltaTime();
+            if (timerDelay <= 0) {
+                aguardandoDragao = false;
+                acaoAtual = 0;
+                dragaoAtacando = true;
+                bolaFogoX = 600;
+                mensagem = "O Dragão lança uma bola de fogo!";
+            }
         }
 
-        if (orcAtacando) {
-            bolaFogoX -= 15; 
+        if (dragaoAtacando) {
+            bolaFogoX -= 8; 
             if (bolaFogoX <= 200) { 
-                orcAtacando = false;
-                orc.atacar(guerreiro);
-                mensagem = "O Orc te acertou com magia!";
-                if (guerreiro.getVida() <= 0) {
-                    mensagem = "DERROTA! Voce foi eliminado.";
+                dragaoAtacando = false;
+                dragao.atacar(grupoHerois);
+                if (grupoHerois.getVida() <= 0) {
+                    mensagem = "DERROTA! O grupo foi eliminado.";
+                } else {
+                    mensagem = "Você sobreviveu! Sua vez de agir.";
+                }
+            }
+        }
+        
+        if (guerreiroAtacando) {
+            bolaFogoGuerreiroX += 12; 
+            if (bolaFogoGuerreiroX >= 600) { 
+                guerreiroAtacando = false;
+                grupoHerois.atacar(dragao);
+                if (buffAtivo) {
+                    grupoHerois.atacar(dragao); 
+                    buffAtivo = false;
+                    pontuacao += 30;
+                    mensagem = "CRÍTICO! O rebote causou Dano Duplo no Dragão!";
+                } else {
+                    pontuacao += 15;
+                    mensagem = "O Guerreiro acertou a magia de volta no Dragão!";
+                }
+
+                if (dragao.getVida() <= 0) {
+                    pontuacao += 100;
+                }
+
+                if (pontuacao >= META_PONTUACAO) {
+                    mensagem = "VITÓRIA SUPREMA! Você fez " + pontuacao + " pontos e salvou o reino!";
+                } else if (dragao.getVida() <= 0) {
+                    mensagem = "Onda concluída! Curando o grupo... O próximo Dragão chega em breve!";
+                    grupoHerois.curar(40);
+                    dragao = new Personagem("Dragão Ancião", 200, 18);
+                    rDragao = 0.5f + random.nextFloat() * 0.5f;
+                    gDragao = 0.5f;
+                    bDragao = 0.8f + random.nextFloat() * 0.2f;
+                    aguardandoDragao = true;
+                    timerDelay = 4.0f;
+                } else {
+                    aguardandoDragao = true;
+                    timerDelay = 1.0f; 
                 }
             }
         }
 
         if (estadoTela == 0) {
             if (Gdx.input.isKeyJustPressed(Input.Keys.ENTER) || isClicado(260, 300, 400, 120)) {
-                guerreiro = new Personagem("Guerreiro", 100, 20);
-                orc = new Personagem("Orc", 80, 15);
-                mensagem = "Aguardando comando...";
+                grupoHerois = new Personagem("Grupo Heróis", 100, 20);
+                dragao = new Personagem("Dragão Ancião", 200, 18);
                 estadoTela = 1;
                 pontuacao = 0;
-                orcAtacando = false;
+                dragaoAtacando = false;
+                guerreiroAtacando = false;
+                buffAtivo = false;
+                acaoAtual = 0;
+                
+                aguardandoDragao = true;
+                timerDelay = 0.5f;
+                mensagem = "ALERTA: O Dragão toma a iniciativa!";
             }
 
             batch.begin();
@@ -114,42 +197,48 @@ public class Main extends ApplicationAdapter {
             batch.draw(arvoresMeio, 0, 0, 960, 720);
             batch.draw(arvoresFrente, 0, 0, 960, 720);
             batch.draw(chao, 0, 0, 960, 200);
-            
-            batch.draw(painel, 180, 180, 600, 350); 
             batch.end();
+
+            Gdx.gl.glEnable(GL20.GL_BLEND);
+            Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
+            shape.begin(ShapeRenderer.ShapeType.Filled);
+            shape.setColor(0, 0, 0, 0.7f);
+            shape.rect(0, 0, 960, 720);
+            shape.end();
+            Gdx.gl.glDisable(GL20.GL_BLEND);
 
             batch.begin();
             fonte.getData().setScale(2.5f);
-            fonte.draw(batch, "ARENA RPG", 350, 400); 
+            fonte.draw(batch, "ARENA RPG", 350, 450); 
             fonte.getData().setScale(1.2f);
-            fonte.draw(batch, "Pressione [ENTER] ou Clique aqui para iniciar", 260, 320); 
+            fonte.draw(batch, "Pressione [ENTER] ou Clique aqui para iniciar", 280, 350); 
             batch.end();
 
         } else if (estadoTela == 1) {
-            if (guerreiro.getVida() > 0 && orc.getVida() > 0 && !orcAtacando) {
-                if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_1) || isClicado(60, 80, 150, 40)) {
-                    guerreiro.atacar(orc);
-                    posicaoXGuerreiro = 350; 
-                    pontuacao += 10;
-                    mensagem = "Voce atacou o Orc! (+10 pts)";
-
-                    if (orc.getVida() <= 0) {
-                        pontuacao += 50;
-                        mensagem = "VITORIA! O Orc foi derrotado. (+50 pts)";
+            if (grupoHerois.getVida() > 0 && pontuacao < META_PONTUACAO && !dragaoAtacando && !aguardandoDragao && !guerreiroAtacando) {
+                if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_1) || isClicado(30, 80, 200, 30)) {
+                    guerreiroAtacando = true;
+                    bolaFogoGuerreiroX = 260; 
+                    xGuerreiro = 220; 
+                    acaoAtual = 1;
+                    mensagem = "Guerreiro usa a espada para rebater o fogo!";
+                } else if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_2) || isClicado(260, 80, 200, 30)) {
+                    grupoHerois.curar(30);
+                    acaoAtual = 2;
+                    mensagem = "Mago conjurou cura para todo o grupo!";
+                    aguardandoDragao = true;
+                    timerDelay = 1.0f;
+                } else if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_3) || isClicado(490, 80, 200, 30)) {
+                    if (!buffAtivo) {
+                        buffAtivo = true;
+                        acaoAtual = 3;
+                        mensagem = "BUFF aplicado! Ataque agora (Turno Livre)!";
                     } else {
-                        orcAtacando = true;
-                        bolaFogoX = 600;
-                        mensagem += " Ele esta conjurando magia!";
+                        mensagem = "O BUFF já está ativo! Use o Guerreiro para atacar.";
                     }
-                } else if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_2) || isClicado(250, 80, 250, 40)) {
-                    guerreiro.curar(30);
-                    mensagem = "Voce recuperou vida!";
-                    orcAtacando = true;
-                    bolaFogoX = 600;
-                    mensagem += " O Orc conjurou magia!";
                 }
-            } else if (guerreiro.getVida() <= 0 || orc.getVida() <= 0) {
-                if (Gdx.input.isKeyJustPressed(Input.Keys.R) || isClicado(60, 80, 300, 40)) {
+            } else if (grupoHerois.getVida() <= 0 || pontuacao >= META_PONTUACAO) {
+                if (Gdx.input.isKeyJustPressed(Input.Keys.R) || isClicado(30, 80, 300, 30)) {
                     estadoTela = 0;
                 }
             }
@@ -161,61 +250,96 @@ public class Main extends ApplicationAdapter {
             batch.draw(arvoresFrente, 0, 0, 960, 720);
             batch.draw(chao, 0, 0, 960, 200);
 
-            batch.draw(spriteGuerreiro, posicaoXGuerreiro, 150, 150, 150); 
-            batch.draw(spriteOrc, 600, 150, 150, 150, 0, 0, spriteOrc.getWidth(), spriteOrc.getHeight(), true, false);
+            if (buffAtivo) {
+                batch.setColor(1f, 0.3f, 0.3f, 1f); 
+            } else {
+                batch.setColor(1f, 1f, 1f, 1f); 
+            }
+            batch.draw(spriteAssassino, xAssassino, 150, 150, 150); 
+            
+            if (acaoAtual == 2 && aguardandoDragao) {
+                batch.setColor(0.3f, 1f, 0.3f, 1f); 
+            } else {
+                batch.setColor(1f, 1f, 1f, 1f); 
+            }
+            batch.draw(spriteMago, xMago, 150, 150, 150); 
+            batch.draw(spriteGuerreiro, xGuerreiro, 150, 150, 150); 
+            
+            batch.setColor(1f, 1f, 1f, 1f); 
 
-            if (orcAtacando) {
+            if (dragao.getVida() <= 0) {
+                batch.setColor(0.4f, 0.2f, 0.2f, 1f); 
+            } else if (pontuacao >= META_PONTUACAO) {
+                batch.setColor(0.4f, 0.2f, 0.2f, 1f);
+            } else {
+                batch.setColor(rDragao, gDragao, bDragao, 1f);
+            }
+            batch.draw(spriteDragao, 550, 80, 280, 280, 0, 0, spriteDragao.getWidth(), spriteDragao.getHeight(), true, false);
+            batch.setColor(1f, 1f, 1f, 1f); 
+
+            if (dragaoAtacando) {
                 batch.draw(bolaFogo, bolaFogoX, 180, 60, 60); 
             }
-
-            batch.draw(painel, 10, 480, 280, 300); 
-            batch.draw(painel, 670, 480, 280, 300); 
             
-            batch.draw(painel, 10, -80, 940, 320); 
+            if (guerreiroAtacando) {
+                batch.draw(bolaFogo, bolaFogoGuerreiroX, 180, 60, 60, 0, 0, bolaFogo.getWidth(), bolaFogo.getHeight(), true, false); 
+            }
             batch.end();
 
+            Gdx.gl.glEnable(GL20.GL_BLEND);
+            Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
             shape.begin(ShapeRenderer.ShapeType.Filled);
-            
-            shape.setColor(0.3f, 0.3f, 0.3f, 1f);
-            shape.rect(40, 580, 200, 18);
-            shape.setColor(0.2f, 0.8f, 0.2f, 1f);
-            float hpGuerreiro = Math.max(0, ((float) guerreiro.getVida() / 100) * 200);
-            shape.rect(40, 580, hpGuerreiro, 18);
+            shape.setColor(0, 0, 0, 0.6f);
+            shape.rect(10, 580, 250, 120); 
+            shape.rect(700, 580, 250, 120); 
+            shape.rect(10, 10, 940, 120); 
+            shape.end();
+            Gdx.gl.glDisable(GL20.GL_BLEND);
 
+            shape.begin(ShapeRenderer.ShapeType.Filled);
             shape.setColor(0.3f, 0.3f, 0.3f, 1f);
-            shape.rect(710, 580, 200, 18);
+            shape.rect(30, 600, 210, 20);
+            shape.setColor(0.2f, 0.8f, 0.2f, 1f);
+            float hpGuerreiro = Math.max(0, ((float) grupoHerois.getVida() / 100) * 210);
+            shape.rect(30, 600, hpGuerreiro, 20);
+            shape.setColor(0.3f, 0.3f, 0.3f, 1f);
+            shape.rect(720, 600, 210, 20);
             shape.setColor(0.8f, 0.2f, 0.2f, 1f);
-            float hpOrc = Math.max(0, ((float) orc.getVida() / 80) * 200);
-            shape.rect(710, 580, hpOrc, 18);
-            
+            float hpDragao = Math.max(0, ((float) dragao.getVida() / 200) * 210);
+            shape.rect(720, 600, hpDragao, 20);
             shape.end();
 
             batch.begin();
-            fonte.getData().setScale(1.1f);
-
-            fonte.draw(batch, guerreiro.getNome(), 40, 660);
-            fonte.draw(batch, "Vida: " + guerreiro.getVida(), 40, 625);
+            fonte.getData().setScale(0.8f);
+            fonte.draw(batch, "GRUPO DE HERÓIS", 30, 680);
+            fonte.draw(batch, "Vida Total: " + grupoHerois.getVida(), 30, 645);
             
-            fonte.getData().setScale(1.5f);
-            fonte.draw(batch, "PONTOS: " + pontuacao, 400, 700);
-            fonte.getData().setScale(1.1f);
+            if (buffAtivo) {
+                fonte.setColor(1f, 0.4f, 0.4f, 1f);
+                fonte.draw(batch, ">> BUFF DE DANO ATIVO <<", 30, 560);
+                fonte.setColor(1f, 1f, 1f, 1f);
+            }
+            
+            fonte.getData().setScale(1.2f);
+            fonte.draw(batch, "PONTOS: " + pontuacao + " / " + META_PONTUACAO, 400, 700);
+            fonte.getData().setScale(0.8f);
             
             fonte.draw(batch, "VS", 465, 640);
+            fonte.draw(batch, dragao.getNome().toUpperCase(), 720, 680);
+            fonte.draw(batch, "Vida Total: " + dragao.getVida(), 720, 645);
 
-            fonte.draw(batch, orc.getNome(), 710, 660);
-            fonte.draw(batch, "Vida: " + orc.getVida(), 710, 625);
-
-            if (guerreiro.getVida() > 0 && orc.getVida() > 0) {
-                if (!orcAtacando) {
-                    fonte.draw(batch, "[1] Atacar", 60, 110);
-                    fonte.draw(batch, "[2] Curar (+30 HP)", 250, 110);
+            if (grupoHerois.getVida() > 0 && pontuacao < META_PONTUACAO) {
+                if (!dragaoAtacando && !aguardandoDragao && !guerreiroAtacando) {
+                    fonte.draw(batch, "[1] Guerreiro (Rebater)", 30, 100);
+                    fonte.draw(batch, "[2] Mago (Curar)", 260, 100);
+                    fonte.draw(batch, "[3] Assassino (Buff)", 490, 100);
                 } else {
-                    fonte.draw(batch, "Aguarde o turno do inimigo...", 60, 110);
+                    fonte.draw(batch, "Aguarde a animacao...", 30, 100);
                 }
             } else {
-                fonte.draw(batch, "[R] Voltar ao Menu (Clique aqui)", 60, 110);
+                fonte.draw(batch, "[R] Voltar ao Menu (Clique aqui)", 30, 100);
             }
-            fonte.draw(batch, "Log: " + mensagem, 60, 65);
+            fonte.draw(batch, "Log: " + mensagem, 30, 50);
 
             batch.end();
         }
@@ -232,8 +356,9 @@ public class Main extends ApplicationAdapter {
         arvoresFrente.dispose();
         chao.dispose();
         spriteGuerreiro.dispose();
-        spriteOrc.dispose();
-        painel.dispose();
+        spriteMago.dispose();
+        spriteAssassino.dispose();
+        spriteDragao.dispose();
         bolaFogo.dispose();
     }
 }
